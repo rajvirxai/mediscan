@@ -1,0 +1,24 @@
+import os
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+# Use a local SQLite database for the MVP
+SQLALCHEMY_DATABASE_URL = "sqlite:///./mediscan.db"
+
+# Setting check_same_thread=False is needed for SQLite in FastAPI (which uses multiple threads)
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
+
+# Dependency for FastAPI to get a DB session
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
