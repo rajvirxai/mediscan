@@ -1,0 +1,241 @@
+{
+  "samples": [
+    {
+      "id": "sample_01",
+      "filename_png": "sample_01_prescription_interaction_hero.png",
+      "filename_pdf": "sample_01_prescription_interaction_hero.pdf",
+      "type": "prescription",
+      "category": "Hero Demo Video (Drug-Drug Interaction Trigger)",
+      "facility": "CityCare Cardiology & Internal Clinic",
+      "physician": "Dr. Arthur Vance, MD, FACC",
+      "patient": {
+        "name": "Robert Miller",
+        "age": "58 Yrs",
+        "gender": "Male",
+        "id": "PT-904812",
+        "date": "2026-10-18",
+        "diagnosis": "Chronic Atrial Fibrillation, Acute Knee Joint Inflammation"
+      },
+      "prescribed_medications": [
+        {
+          "name": "Warfarin Sodium",
+          "strength": "5 mg",
+          "form": "Tablet",
+          "dosage_instructions": "Take 1 tablet orally once daily at 8:00 PM in the evening.",
+          "timing": "20:00",
+          "frequency": "Once daily",
+          "duration": "30 Days",
+          "quantity": 30
+        },
+        {
+          "name": "Ibuprofen",
+          "strength": "400 mg",
+          "form": "Tablet",
+          "dosage_instructions": "Take 1 tablet orally twice daily with meals (8:00 AM, 8:00 PM) for joint pain.",
+          "timing": "08:00, 20:00",
+          "frequency": "Twice daily",
+          "duration": "10 Days",
+          "quantity": 20
+        },
+        {
+          "name": "Pantoprazole",
+          "strength": "40 mg",
+          "form": "Tablet",
+          "dosage_instructions": "Take 1 tablet orally once daily in the morning at 7:30 AM (before breakfast).",
+          "timing": "07:30",
+          "frequency": "Once daily",
+          "duration": "30 Days",
+          "quantity": 30
+        }
+      ],
+      "expected_interactions": [
+        {
+          "pair": "warfarin + ibuprofen",
+          "severity": "CRITICAL",
+          "warning": "Increased risk of severe bleeding."
+        }
+      ],
+      "demo_video_role": "Primary video sample for shot 0:20-0:40 (Upload), 0:40-1:10 (Textract OCR), 1:10-1:40 (Translation), and 1:40-2:00 (Interaction Warning Banner)."
+    },
+    {
+      "id": "sample_02",
+      "filename_png": "sample_02_prescription_chronic_routine.png",
+      "filename_pdf": "sample_02_prescription_chronic_routine.pdf",
+      "type": "prescription",
+      "category": "Routine Chronic Disease Maintenance (Multi-Medication Translation & Timing)",
+      "facility": "St. Jude Endocrinology Clinic",
+      "physician": "Dr. Elena Rostova, MD, FACE",
+      "patient": {
+        "name": "Eleanor Davies",
+        "age": "64 Yrs",
+        "gender": "Female",
+        "id": "PT-330198",
+        "date": "2026-10-19",
+        "diagnosis": "Type 2 Diabetes Mellitus, Essential Hypertension, Dyslipidemia"
+      },
+      "prescribed_medications": [
+        {
+          "name": "Metformin HCl",
+          "strength": "500 mg Extended-Release",
+          "form": "Tablet",
+          "dosage_instructions": "Take 1 tablet orally twice daily with meals (Breakfast 8:30 AM, Dinner 8:30 PM).",
+          "timing": "08:30, 20:30",
+          "frequency": "Twice daily",
+          "duration": "90 Days"
+        },
+        {
+          "name": "Amlodipine Besylate",
+          "strength": "5 mg",
+          "form": "Tablet",
+          "dosage_instructions": "Take 1 tablet orally once daily every morning at 8:00 AM.",
+          "timing": "08:00",
+          "frequency": "Once daily",
+          "duration": "90 Days"
+        },
+        {
+          "name": "Atorvastatin Calcium",
+          "strength": "20 mg",
+          "form": "Tablet",
+          "dosage_instructions": "Take 1 tablet orally once daily at bedtime (10:00 PM).",
+          "timing": "22:00",
+          "frequency": "Once daily (bedtime)",
+          "duration": "90 Days"
+        }
+      ],
+      "expected_interactions": [],
+      "demo_video_role": "Clean negative control (no dangerous interaction). Shows clear schedule organization, multi-dose alarm setup, and plain-language translation of complex chronic instructions."
+    },
+    {
+      "id": "sample_03",
+      "filename_png": "sample_03_lab_report_comprehensive_metabolic.png",
+      "filename_pdf": "sample_03_lab_report_comprehensive_metabolic.pdf",
+      "type": "lab_report",
+      "category": "Diagnostic Pathology Lab Report (Abnormal Flags & Plain-Language Translation)",
+      "facility": "Apex Diagnostic Pathology Lab",
+      "physician": "Dr. Ramesh Patel, MD (Pathology)",
+      "patient": {
+        "name": "Sarah Jenkins",
+        "age": "47 Yrs",
+        "gender": "Female",
+        "id": "LAB-881903",
+        "date": "2026-10-20",
+        "panel": "Comprehensive Metabolic Chemistry & Fasting Lipid Panel"
+      },
+      "lab_investigations": [
+        {"test": "Fasting Blood Glucose", "value": "148", "unit": "mg/dL", "reference": "70 - 99", "status": "HIGH"},
+        {"test": "Glycated Hemoglobin (HbA1c)", "value": "7.8", "unit": "%", "reference": "4.0 - 5.6", "status": "HIGH"},
+        {"test": "Total Serum Cholesterol", "value": "245", "unit": "mg/dL", "reference": "< 200", "status": "HIGH"},
+        {"test": "Triglycerides", "value": "215", "unit": "mg/dL", "reference": "< 150", "status": "HIGH"},
+        {"test": "HDL Cholesterol (Good)", "value": "38", "unit": "mg/dL", "reference": "> 40", "status": "LOW"},
+        {"test": "LDL Cholesterol (Bad)", "value": "164", "unit": "mg/dL", "reference": "< 100", "status": "HIGH"},
+        {"test": "Serum Creatinine", "value": "0.92", "unit": "mg/dL", "reference": "0.60 - 1.20", "status": "NORMAL"},
+        {"test": "Blood Urea Nitrogen (BUN)", "value": "14.2", "unit": "mg/dL", "reference": "7.0 - 20.0", "status": "NORMAL"},
+        {"test": "Serum Potassium", "value": "4.3", "unit": "mEq/L", "reference": "3.5 - 5.1", "status": "NORMAL"},
+        {"test": "Total Bilirubin", "value": "0.80", "unit": "mg/dL", "reference": "0.20 - 1.20", "status": "NORMAL"}
+      ],
+      "expected_plain_language_summary": "Explains that blood sugar and cholesterol/LDL levels are higher than recommended, explains what HbA1c 7.8% means without medical jargon, and highlights that kidney function tests are healthy.",
+      "demo_video_role": "Demonstrates MediScan's capability on lab test reports, showing tabular text extraction and non-alarmist plain-language diagnostic translation."
+    },
+    {
+      "id": "sample_04",
+      "filename_png": "sample_04_prescription_pediatric_antibiotic.png",
+      "filename_pdf": "sample_04_prescription_pediatric_antibiotic.pdf",
+      "type": "prescription",
+      "category": "Acute Pediatric Care & Strict Course Adherence",
+      "facility": "Sunrise Pediatrics & Urgent Care",
+      "physician": "Dr. Michael Chen, MD, FAAP",
+      "patient": {
+        "name": "Lucas Martin",
+        "age": "8 Yrs",
+        "gender": "Male",
+        "id": "PED-551029",
+        "date": "2026-10-21",
+        "diagnosis": "Acute Streptococcal Pharyngotonsillitis"
+      },
+      "prescribed_medications": [
+        {
+          "name": "Amoxicillin",
+          "strength": "250 mg / 5 mL",
+          "form": "Oral Suspension",
+          "dosage_instructions": "Give 10 mL (500 mg) orally every 8 hours (8:00 AM, 4:00 PM, 12:00 AM) for 10 days.",
+          "timing": "08:00, 16:00, 00:00",
+          "frequency": "Every 8 hours",
+          "duration": "10 Days",
+          "critical_instruction": "Finish full 10-day course even after symptoms clear."
+        },
+        {
+          "name": "Paracetamol (Acetaminophen)",
+          "strength": "160 mg / 5 mL",
+          "form": "Pediatric Suspension",
+          "dosage_instructions": "Give 12 mL (384 mg) orally every 6 hours as needed for fever > 101 F.",
+          "timing": "PRN (As needed, every 6h)",
+          "frequency": "As needed (max 4 doses/24h)",
+          "duration": "PRN"
+        },
+        {
+          "name": "Oral Electrolyte Rehydration Solution",
+          "form": "Solution",
+          "dosage_instructions": "Administer 150-250 mL frequently throughout the day to support hydration.",
+          "frequency": "Frequently throughout day",
+          "duration": "5 Days"
+        }
+      ],
+      "expected_interactions": [],
+      "demo_video_role": "Highlights caregiver clarity, strict course completion alerts, and 8-hour schedule alarm management."
+    },
+    {
+      "id": "sample_05",
+      "filename_png": "sample_05_prescription_cardio_clopidogrel.png",
+      "filename_pdf": "sample_05_prescription_cardio_clopidogrel.pdf",
+      "type": "prescription",
+      "category": "Post-Surgical Cardiology & Drug Interaction Test (Clopidogrel + Omeprazole)",
+      "facility": "Metro Heart & Vascular Institute",
+      "physician": "Dr. David Goldberg, MD, FACC",
+      "patient": {
+        "name": "Harold Evans",
+        "age": "67 Yrs",
+        "gender": "Male",
+        "id": "CARD-77301",
+        "date": "2026-10-22",
+        "diagnosis": "Coronary Artery Disease, Status Post Percutaneous Coronary Intervention (PCI)"
+      },
+      "prescribed_medications": [
+        {
+          "name": "Clopidogrel",
+          "strength": "75 mg",
+          "form": "Tablet",
+          "dosage_instructions": "Take 1 tablet orally once daily every morning at 9:00 AM with food.",
+          "timing": "09:00",
+          "frequency": "Once daily",
+          "duration": "180 Days"
+        },
+        {
+          "name": "Omeprazole",
+          "strength": "20 mg",
+          "form": "Delayed-Release Capsule",
+          "dosage_instructions": "Take 1 capsule orally once daily 30 minutes before breakfast (8:30 AM).",
+          "timing": "08:30",
+          "frequency": "Once daily",
+          "duration": "30 Days"
+        },
+        {
+          "name": "Aspirin",
+          "strength": "81 mg",
+          "form": "Enteric-Coated Tablet",
+          "dosage_instructions": "Take 1 tablet orally once daily with morning meal (9:00 AM).",
+          "timing": "09:00",
+          "frequency": "Once daily",
+          "duration": "180 Days"
+        }
+      ],
+      "expected_interactions": [
+        {
+          "pair": "clopidogrel + omeprazole",
+          "severity": "HIGH",
+          "warning": "Decreased effectiveness of clopidogrel, increasing heart attack risk."
+        }
+      ],
+      "demo_video_role": "Second negative interaction verification sample, proving the interaction engine is general and not hardcoded to a single demo case."
+    }
+  ]
+}

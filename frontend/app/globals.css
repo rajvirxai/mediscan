@@ -1,0 +1,74 @@
+@import "tailwindcss";
+
+:root {
+  --background: #F8F8F2;
+  --foreground: #22252A;
+  
+  /* Pastel Bento Palette */
+  --bento-bg: #F8F8F2;
+  --bento-card-cream: #FFFFFF;
+  --bento-blue: #D6E8FD;
+  --bento-blue-accent: #93C5FD;
+  --bento-blue-pill: #BFDBFE;
+  
+  --bento-amber: #FDE6AA;
+  --bento-amber-accent: #F5CA68;
+  --bento-amber-pill: #FED7AA;
+  
+  --bento-sage: #DFEFB3;
+  --bento-sage-accent: #BEDB76;
+  --bento-sage-pill: #CEE79B;
+  
+  --bento-peach: #FDCBB8;
+  --bento-peach-accent: #F99E7F;
+  --bento-peach-pill: #FCA5A5;
+  
+  --bento-lavender: #DED5FF;
+  --bento-lavender-accent: #BAA8F8;
+  --bento-lavender-pill: #DDD6FE;
+  
+  --bento-charcoal: #23272A;
+  --bento-muted: #79828B;
+}
+
+@theme inline {
+  --font-sans: var(--font-urbanist), ui-sans-serif, system-ui, sans-serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+}
+
+body {
+  font-family: var(--font-urbanist), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background-color: #F8F8F2;
+  color: #22252A;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Tactile Bento Card shadows */
+.bento-shadow {
+  box-shadow: 0 8px 24px -6px rgba(45, 52, 60, 0.05), 0 2px 6px -1px rgba(45, 52, 60, 0.02);
+}
+
+.bento-pill-shadow {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.bento-btn-shadow {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: #F8F8F2;
+}
+::-webkit-scrollbar-thumb {
+  background: #D8D8CF;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #B8B8AF;
+}
