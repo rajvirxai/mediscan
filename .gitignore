@@ -20,3 +20,10 @@ venv.bak/
 # OS Files
 .DS_Store
 Thumbs.db
+
+# Antigravity
+.agents/
+skills-lock.json
+mediscan-mvp-implementation-plan (3).md
+rajvir-tasks.md
+subhajit-tasks.md

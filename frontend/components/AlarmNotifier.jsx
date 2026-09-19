@@ -32,9 +32,9 @@ const AlarmNotifier = ({ schedules = [] }) => {
   const triggerAlarm = (schedule) => {
     setActiveAlarms((prev) => [...prev, schedule.id]);
 
-    // 1. Play sound (Ensure alarm.mp3 exists in the public directory)
+    // 1. Play sound
     try {
-      const audio = new Audio('/alarm.mp3');
+      const audio = new Audio('/alarmmm.mpeg');
       audio.play().catch(e => console.warn("Audio playback blocked by browser until user interacts", e));
     } catch (e) {
       console.error("Failed to play audio", e);
