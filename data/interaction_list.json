@@ -1,0 +1,17 @@
+{
+  "warfarin + ibuprofen": "Increased risk of severe bleeding.",
+  "metformin + alcohol": "Increased risk of lactic acidosis.",
+  "amoxicillin + methotrexate": "Increased risk of methotrexate toxicity.",
+  "sildenafil + nitroglycerin": "Severe and potentially fatal drop in blood pressure.",
+  "atorvastatin + grapefruit juice": "Increased risk of statin toxicity and muscle damage.",
+  "lisinopril + ibuprofen": "Decreased effectiveness of lisinopril and risk of kidney damage.",
+  "clopidogrel + omeprazole": "Decreased effectiveness of clopidogrel, increasing heart attack risk.",
+  "spironolactone + potassium": "Risk of dangerously high blood potassium levels (hyperkalemia).",
+  "simvastatin + amiodarone": "Increased risk of muscle breakdown (rhabdomyolysis).",
+  "citalopram + tramadol": "Increased risk of serotonin syndrome and seizures.",
+  "levothyroxine + calcium": "Decreased absorption of levothyroxine; take at least 4 hours apart.",
+  "warfarin + aspirin": "Significantly increased risk of gastrointestinal bleeding.",
+  "digoxin + clarithromycin": "Increased digoxin levels leading to potential toxicity.",
+  "metronidazole + alcohol": "Severe nausea, vomiting, and headache (disulfiram-like reaction).",
+  "fluoxetine + phenelzine": "High risk of fatal serotonin syndrome; requires a 14-day washout period."
+}
