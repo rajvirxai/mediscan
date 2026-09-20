@@ -1,212 +1,161 @@
 {
   "version": "2.0.0",
-  "generated_at": "2026-10-14",
-  "target_directory": "data/sample_documents",
-  "frontend_mirror": "frontend/public/samples",
-  "documents": [
+  "samples": [
     {
       "id": "sample_01",
-      "file_base": "sample_01_flagged_rx",
-      "png_path": "data/sample_documents/sample_01_flagged_rx.png",
-      "pdf_path": "data/sample_documents/sample_01_flagged_rx.pdf",
-      "document_type": "Outpatient Prescription (Cardiology)",
-      "target_feature": "Drug-Drug Interaction Detection (Positive Flag)",
-      "clinic": {
-        "name": "METROPOLITAN CARDIOVASCULAR & INTERNAL CLINIC",
-        "physician": "Dr. Marcus Thorne, MD, FACC",
-        "license": "IL-MED-88391",
-        "npi": "1849204918"
-      },
+      "filename_png": "sample_01_flagged_rx.png",
+      "filename_pdf": "sample_01_flagged_rx.pdf",
+      "category": "Cardiology & Anticoagulation Outpatient Prescription",
+      "facility": "Metropolitan Cardiovascular & Internal Clinic",
       "patient": {
         "name": "Eleanor Vance",
         "age": 64,
         "gender": "Female",
-        "patient_id": "PT-88204",
-        "date": "2026-10-14",
-        "diagnosis": "Non-valvular Atrial Fibrillation (AFib), Mild Knee Osteoarthritis, Dyspepsia"
+        "id": "PT-88204"
       },
       "medications": [
-        {
-          "name": "Warfarin Sodium",
-          "dosage": "5 mg",
-          "form": "Tablet",
-          "frequency": "Once daily at 8:00 PM",
-          "duration": "30 Days",
-          "quantity": 30,
-          "timing_24h": "20:00"
-        },
-        {
-          "name": "Aspirin (Enteric Coated)",
-          "dosage": "81 mg",
-          "form": "Tablet",
-          "frequency": "Once daily with breakfast at 8:00 AM",
-          "duration": "30 Days",
-          "quantity": 30,
-          "timing_24h": "08:00"
-        },
-        {
-          "name": "Omeprazole",
-          "dosage": "20 mg",
-          "form": "Delayed-Release Capsule",
-          "frequency": "Once daily 30 min before breakfast at 7:30 AM",
-          "duration": "30 Days",
-          "quantity": 30,
-          "timing_24h": "07:30"
-        }
+        "Warfarin Sodium 5 mg",
+        "Aspirin 81 mg",
+        "Omeprazole 20 mg"
       ],
-      "ground_truth_interaction": {
-        "detected": true,
-        "severity": "HIGH",
-        "interacting_pair": ["Warfarin", "Aspirin"],
-        "clinical_warning": "Significantly increased risk of gastrointestinal bleeding.",
-        "action_required": "Alert prescriber and pharmacist immediately; monitor coagulation/INR closely."
-      }
+      "expected_interactions": [
+        {
+          "pair": "warfarin + aspirin",
+          "severity": "HIGH",
+          "warning": "Significantly increased risk of gastrointestinal bleeding."
+        }
+      ]
     },
     {
       "id": "sample_02",
-      "file_base": "sample_02_standard_rx",
-      "png_path": "data/sample_documents/sample_02_standard_rx.png",
-      "pdf_path": "data/sample_documents/sample_02_standard_rx.pdf",
-      "document_type": "Outpatient Prescription (Family Medicine)",
-      "target_feature": "Clean Negative Control & Plain Language Translation",
-      "clinic": {
-        "name": "BEACON FAMILY HEALTH & URGENT CARE",
-        "physician": "Dr. Sarah Jenkins, MD",
-        "license": "TX-CLIN-44910",
-        "npi": "1092837410"
-      },
+      "filename_png": "sample_02_standard_rx.png",
+      "filename_pdf": "sample_02_standard_rx.pdf",
+      "category": "Family Health & Acute Infection Negative Control",
+      "facility": "Beacon Family Health & Urgent Care",
       "patient": {
         "name": "David K. Miller",
         "age": 36,
         "gender": "Male",
-        "patient_id": "PT-44109",
-        "date": "2026-10-15",
-        "diagnosis": "Acute Bacterial Pharyngitis / Sinusitis, Allergic Rhinitis"
+        "id": "PT-44109"
       },
       "medications": [
-        {
-          "name": "Amoxicillin",
-          "dosage": "500 mg",
-          "form": "Oral Capsule",
-          "frequency": "Every 8 hours (8:00 AM, 4:00 PM, 12:00 AM)",
-          "duration": "7 Days",
-          "quantity": 21,
-          "timing_24h": ["08:00", "16:00", "00:00"]
-        },
-        {
-          "name": "Paracetamol (Acetaminophen)",
-          "dosage": "650 mg",
-          "form": "Tablet",
-          "frequency": "Every 6 hours as needed (Max 4000mg/day)",
-          "duration": "5 Days",
-          "quantity": 20,
-          "timing_24h": "PRN"
-        },
-        {
-          "name": "Cetirizine Hydrochloride",
-          "dosage": "10 mg",
-          "form": "Tablet",
-          "frequency": "Once daily at bedtime (10:00 PM)",
-          "duration": "10 Days",
-          "quantity": 10,
-          "timing_24h": "22:00"
-        }
+        "Amoxicillin 500 mg",
+        "Paracetamol 650 mg",
+        "Cetirizine HCl 10 mg"
       ],
-      "ground_truth_interaction": {
-        "detected": false,
-        "severity": "NONE",
-        "interacting_pair": [],
-        "clinical_warning": null
-      }
+      "expected_interactions": []
     },
     {
       "id": "sample_03",
-      "file_base": "sample_03_cbc_lab_report",
-      "png_path": "data/sample_documents/sample_03_cbc_lab_report.png",
-      "pdf_path": "data/sample_documents/sample_03_cbc_lab_report.pdf",
-      "document_type": "Pathology Diagnostic Laboratory Report",
-      "target_feature": "Tabular Extraction (Textract TABLES) & Diagnostic Interpretation",
-      "clinic": {
-        "name": "APEX DIAGNOSTICS & PATHOLOGY LABORATORIES",
-        "physician": "Dr. Gregory Ross, MD, FCAP",
-        "license": "CLIA-99D0876543",
-        "director": "Dr. Gregory Ross, MD"
-      },
+      "filename_png": "sample_03_cbc_lab_report.png",
+      "filename_pdf": "sample_03_cbc_lab_report.pdf",
+      "category": "Clinical Hematology Pathology CBC Lab Report",
+      "facility": "Apex Diagnostics & Pathology Laboratories",
       "patient": {
         "name": "James R. Thornton",
         "age": 52,
         "gender": "Male",
-        "patient_id": "PT-61094",
-        "date": "2026-10-16",
-        "ordering_physician": "Dr. Rachel Adams, MD"
+        "id": "PT-61094"
       },
-      "tabular_tests": [
-        {"test_name": "White Blood Cells (WBC)", "result": "13.8", "ref_range": "4.5 - 11.0", "units": "10^3 / uL", "flag": "HIGH"},
-        {"test_name": "Red Blood Cells (RBC)", "result": "4.65", "ref_range": "4.30 - 5.90", "units": "10^6 / uL", "flag": "NORMAL"},
-        {"test_name": "Hemoglobin (Hgb)", "result": "11.4", "ref_range": "13.5 - 17.5", "units": "g / dL", "flag": "LOW"},
-        {"test_name": "Hematocrit (Hct)", "result": "35.2", "ref_range": "41.0 - 50.0", "units": "%", "flag": "LOW"},
-        {"test_name": "Mean Corpuscular Volume (MCV)", "result": "88.5", "ref_range": "80.0 - 100.0", "units": "fL", "flag": "NORMAL"},
-        {"test_name": "Platelet Count", "result": "245", "ref_range": "150 - 450", "units": "10^3 / uL", "flag": "NORMAL"},
-        {"test_name": "Neutrophils (Relative)", "result": "78.0", "ref_range": "40.0 - 70.0", "units": "%", "flag": "HIGH"},
-        {"test_name": "Lymphocytes (Relative)", "result": "16.5", "ref_range": "20.0 - 45.0", "units": "%", "flag": "LOW"}
-      ],
-      "clinical_interpretation": "Leukocytosis with relative neutrophilia suggests active acute bacterial infection; mild normocytic normochromic anemia."
+      "expected_interactions": []
     },
     {
       "id": "sample_04",
-      "file_base": "sample_04_noisy_rx",
-      "png_path": "data/sample_documents/sample_04_noisy_rx.png",
-      "pdf_path": "data/sample_documents/sample_04_noisy_rx.pdf",
-      "document_type": "Scanned Outpatient Prescription (with Artifacts)",
-      "target_feature": "OCR Robustness Under Rotation Skew, Watermark & Stamp Artifacts",
-      "clinic": {
-        "name": "OAKRIDGE COMMUNITY HEALTH CLINIC",
-        "physician": "Dr. Evelyn Reed, MD",
-        "license": "WA-MED-99412"
-      },
+      "filename_png": "sample_04_noisy_rx.png",
+      "filename_pdf": "sample_04_noisy_rx.pdf",
+      "category": "Scanned Outpatient Prescription with Skew and Stamp",
+      "facility": "Oakridge Community Health Clinic",
       "patient": {
         "name": "Patricia Higgins",
         "age": 61,
         "gender": "Female",
-        "patient_id": "PT-32890",
-        "date": "2026-10-17",
-        "diagnosis": "Type 2 Diabetes Mellitus, Essential Hypertension, Hyperlipidemia"
-      },
-      "artifacts": {
-        "rotation_skew_degrees": -1.2,
-        "watermark": "CONFIDENTIAL MEDICAL RECORD - DE-IDENTIFIED",
-        "stamp": "OAKRIDGE CLINIC * VERIFIED * DISPENSED 2026-10-17",
-        "signature": "Natural blue cursive ink signature"
+        "id": "PT-32890"
       },
       "medications": [
-        {
-          "name": "Metformin HCl ER",
-          "dosage": "500 mg",
-          "frequency": "Twice daily with meals (8:30 AM, 6:30 PM)",
-          "duration": "90 Days",
-          "quantity": 180
-        },
-        {
-          "name": "Lisinopril",
-          "dosage": "10 mg",
-          "frequency": "Once daily at 8:00 AM",
-          "duration": "90 Days",
-          "quantity": 90
-        },
-        {
-          "name": "Atorvastatin Calcium",
-          "dosage": "20 mg",
-          "frequency": "Once daily at bedtime (9:30 PM)",
-          "duration": "90 Days",
-          "quantity": 90
-        }
+        "Metformin HCl 500 mg ER",
+        "Lisinopril 10 mg",
+        "Atorvastatin Calcium 20 mg"
       ],
-      "ground_truth_interaction": {
-        "detected": false,
-        "severity": "NONE",
-        "interacting_pair": [],
-        "clinical_warning": null
-      }
+      "expected_interactions": []
+    }
+  ],
+  "documents": [
+    {
+      "id": "sample_01",
+      "filename_png": "sample_01_flagged_rx.png",
+      "filename_pdf": "sample_01_flagged_rx.pdf",
+      "category": "Cardiology & Anticoagulation Outpatient Prescription",
+      "facility": "Metropolitan Cardiovascular & Internal Clinic",
+      "patient": {
+        "name": "Eleanor Vance",
+        "age": 64,
+        "gender": "Female",
+        "id": "PT-88204"
+      },
+      "medications": [
+        "Warfarin Sodium 5 mg",
+        "Aspirin 81 mg",
+        "Omeprazole 20 mg"
+      ],
+      "expected_interactions": [
+        {
+          "pair": "warfarin + aspirin",
+          "severity": "HIGH",
+          "warning": "Significantly increased risk of gastrointestinal bleeding."
+        }
+      ]
+    },
+    {
+      "id": "sample_02",
+      "filename_png": "sample_02_standard_rx.png",
+      "filename_pdf": "sample_02_standard_rx.pdf",
+      "category": "Family Health & Acute Infection Negative Control",
+      "facility": "Beacon Family Health & Urgent Care",
+      "patient": {
+        "name": "David K. Miller",
+        "age": 36,
+        "gender": "Male",
+        "id": "PT-44109"
+      },
+      "medications": [
+        "Amoxicillin 500 mg",
+        "Paracetamol 650 mg",
+        "Cetirizine HCl 10 mg"
+      ],
+      "expected_interactions": []
+    },
+    {
+      "id": "sample_03",
+      "filename_png": "sample_03_cbc_lab_report.png",
+      "filename_pdf": "sample_03_cbc_lab_report.pdf",
+      "category": "Clinical Hematology Pathology CBC Lab Report",
+      "facility": "Apex Diagnostics & Pathology Laboratories",
+      "patient": {
+        "name": "James R. Thornton",
+        "age": 52,
+        "gender": "Male",
+        "id": "PT-61094"
+      },
+      "expected_interactions": []
+    },
+    {
+      "id": "sample_04",
+      "filename_png": "sample_04_noisy_rx.png",
+      "filename_pdf": "sample_04_noisy_rx.pdf",
+      "category": "Scanned Outpatient Prescription with Skew and Stamp",
+      "facility": "Oakridge Community Health Clinic",
+      "patient": {
+        "name": "Patricia Higgins",
+        "age": 61,
+        "gender": "Female",
+        "id": "PT-32890"
+      },
+      "medications": [
+        "Metformin HCl 500 mg ER",
+        "Lisinopril 10 mg",
+        "Atorvastatin Calcium 20 mg"
+      ],
+      "expected_interactions": []
     }
   ]
 }
