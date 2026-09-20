@@ -85,6 +85,11 @@ export default function Home() {
 
       setProcessingStep('completed');
 
+      // Save dynamic report to sessionStorage
+      if (typeof window !== 'undefined') {
+        sessionStorage.setItem('mediscan_active_report', JSON.stringify(result));
+      }
+
       // Navigate to results page
       setTimeout(() => {
         router.push('/results');

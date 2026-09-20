@@ -1,6 +1,6 @@
 ﻿'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { AppBottomNav } from '../../components/AppBottomNav';
 import { InteractionBanner } from '../../components/InteractionBanner';
@@ -16,12 +16,37 @@ import {
   Download,
   ShieldAlert,
   ShieldCheck,
-  FileText
+  FileText,
+  Activity
 } from 'lucide-react';
 
 export default function ResultsPage() {
-  const [activeDataset, setActiveDataset] = useState<'flagged' | 'clean'>('flagged');
-  const result: AnalysisResponse = activeDataset === 'flagged' ? MOCK_FLAGGED_PRESCRIPTION : MOCK_CLEAN_PRESCRIPTION;
+  const [activeDataset, setActiveDataset] = useState<'live' | 'flagged' | 'clean'>('live');
+  const [liveReport, setLiveReport] = useState<AnalysisResponse | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem('mediscan_active_report');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          setLiveReport(parsed);
+          setActiveDataset('live');
+        } catch (e) {
+          console.error('Failed to parse active session report:', e);
+        }
+      } else {
+        setActiveDataset('flagged');
+      }
+    }
+  }, []);
+
+  const result: AnalysisResponse =
+    activeDataset === 'live' && liveReport
+      ? liveReport
+      : activeDataset === 'clean'
+      ? MOCK_CLEAN_PRESCRIPTION
+      : MOCK_FLAGGED_PRESCRIPTION;
 
   return (
     <div className="min-h-screen bg-[#F8F8F2] flex flex-col items-center justify-start text-[#23272A] selection:bg-[#D6E8FD]">
@@ -39,6 +64,20 @@ export default function ResultsPage() {
             </Link>
 
             <div className="flex items-center gap-1.5">
+              {liveReport && (
+                <button
+                  type="button"
+                  onClick={() => setActiveDataset('live')}
+                  className={`rounded-full px-2.5 py-1 text-[10px] font-bold transition-all ${
+                    activeDataset === 'live'
+                      ? 'bg-[#23272A] text-white shadow-xs'
+                      : 'bg-[#FAF9F5] text-[#79828B] border border-[#EDEDE5]'
+                  }`}
+                >
+                  🟢 Live Data
+                </button>
+              )}
+
               <button
                 type="button"
                 onClick={() => setActiveDataset('flagged')}
@@ -48,8 +87,9 @@ export default function ResultsPage() {
                     : 'bg-[#FAF9F5] text-[#79828B] border border-[#EDEDE5]'
                 }`}
               >
-                ⚠️ Flagged Alert
+                ⚠️ Flagged
               </button>
+
               <button
                 type="button"
                 onClick={() => setActiveDataset('clean')}
@@ -59,18 +99,25 @@ export default function ResultsPage() {
                     : 'bg-[#FAF9F5] text-[#79828B] border border-[#EDEDE5]'
                 }`}
               >
-                ✓ Safe Regimen
+                ✓ Safe
               </button>
             </div>
           </div>
 
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-black tracking-tight text-[#23272A]">
-                Prescription Report
-              </h1>
+              <div className="flex items-center gap-2">
+                <h1 className="text-xl font-black tracking-tight text-[#23272A]">
+                  Prescription Report
+                </h1>
+                {activeDataset === 'live' && (
+                  <span className="rounded-full bg-[#DFEFB3] text-[#2E4A13] text-[9px] font-bold px-2 py-0.5 border border-[#BEDB76]">
+                    API Connected
+                  </span>
+                )}
+              </div>
               <p className="text-xs text-[#79828B] font-medium">
-                ID: {result.id} • Complete Clinical Analysis
+                ID: {result.id} • {result.prescriber}
               </p>
             </div>
 
