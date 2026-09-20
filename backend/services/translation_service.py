@@ -32,7 +32,7 @@ if not _GEMINI_AVAILABLE:
     print("         Sign up free at https://openrouter.ai then add your sk-or-... key to backend/.env")
 
 _OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions"
-_MODEL = "google/gemini-3.6-flash"  # Valid OpenRouter Gemini model ID
+_MODEL = "google/gemini-2.5-flash"  # Valid OpenRouter Gemini model ID
 
 
 def _call_llm(prompt: str) -> str:
@@ -154,6 +154,7 @@ def translate_prescription(raw_text: str) -> dict:
 
         except json.JSONDecodeError as e:
             print(f"ERROR - Gemini returned invalid JSON: {e}")
+            print(f"RAW RESPONSE: {raw_response}")
             return _offline_fallback(raw_text)
 
         except Exception as e:
