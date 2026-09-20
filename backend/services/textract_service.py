@@ -1,5 +1,12 @@
 import boto3
 import json
+import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+_ENV_PATH = Path(__file__).parent.parent / ".env"
+load_dotenv(dotenv_path=_ENV_PATH)
+
 
 def extract_text_from_document(file_bytes: bytes) -> dict:
     """

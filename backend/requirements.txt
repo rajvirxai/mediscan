@@ -3,3 +3,6 @@ uvicorn
 python-multipart
 sqlalchemy
 boto3
+google-genai
+python-dotenv
+requests

@@ -15,12 +15,10 @@ export interface MedicationItem {
 export interface InteractionWarning {
   id: string;
   severity: SeverityLevel;
-  title: string;
-  description: string;
-  interactingEntities: string[]; // e.g. ["Warfarin (5mg)", "Ibuprofen (400mg)"]
-  clinicalRisk: string;
+  drug1: string;
+  drug2: string;
+  clinicalExplanation: string;
   recommendation: string;
-  source?: string;
 }
 
 export interface AnalysisResponse {

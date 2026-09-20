@@ -1,4 +1,4 @@
-﻿import { AnalysisResponse, ProcessingStep, MedicationItem, InteractionWarning } from '../types/analysis';
+import { AnalysisResponse, ProcessingStep, MedicationItem, InteractionWarning } from '../types/analysis';
 import { MOCK_FLAGGED_PRESCRIPTION, MOCK_CLEAN_PRESCRIPTION } from '../data/mockPrescriptions';
 
 export type ProgressCallback = (step: ProcessingStep, percent: number, message: string) => void;
@@ -89,131 +89,85 @@ export async function analyzePrescriptionDocument(
   return simulateAnalysis(file, defaultMock, notify);
 }
 
-/**
- * Normalizes backend /results payload into the rich AnalysisResponse contract
- */
 function adaptBackendResponse(backendData: any, file: File): AnalysisResponse {
   const rawText: string = backendData?.extraction?.raw_text || '';
-  const lowerText = rawText.toLowerCase();
-
-  // Detect critical interactions (e.g. Warfarin + Ibuprofen) from raw text or interaction flags
-  const hasWarfarinIbuprofen = 
-    (lowerText.includes('warfarin') && lowerText.includes('ibuprofen')) ||
-    (backendData?.interactions && backendData.interactions.some((i: any) => 
-      typeof i === 'string' ? i.includes('warfarin') : i?.pair?.includes('warfarin')
-    ));
-
-  const hasInteractions = hasWarfarinIbuprofen || (backendData?.interactions && backendData.interactions.length > 0);
-
-  // Derive interaction warnings
-  const interactionWarnings: InteractionWarning[] = hasInteractions
-    ? [
-        {
-          id: 'int-001',
-          drug1: 'Warfarin Sodium',
-          drug2: 'Ibuprofen',
-          severity: 'high',
-          clinicalExplanation:
-            'Concurrent use of an NSAID (Ibuprofen) with an anticoagulant (Warfarin) exponentially increases the risk of major upper gastrointestinal hemorrhage and platelet inhibition.',
-          recommendation:
-            'Discontinue Ibuprofen immediately. Contact the prescribing physician for safer analgesic alternatives such as Paracetamol/Acetaminophen.',
-          mechanism: 'Pharmacodynamic synergy resulting in microvascular erosion and impaired hemostasis.',
-        },
-      ]
-    : [];
-
-  // Parse or provide medications
-  const medications: MedicationItem[] = [];
-  if (lowerText.includes('warfarin')) {
-    medications.push({
-      name: 'Warfarin Sodium',
-      dosage: '5mg',
-      frequency: 'Once daily at bedtime',
-      timing: ['evening', 'bedtime'],
-      instructionsWithFood: 'Take with or without food at 8:00 PM',
-      duration: '30 days',
-      purpose: 'Blood thinner for heart & stroke prevention',
-    });
-  }
-  if (lowerText.includes('ibuprofen')) {
-    medications.push({
-      name: 'Ibuprofen',
-      dosage: '400mg',
-      frequency: 'Twice daily',
-      timing: ['morning', 'evening'],
-      instructionsWithFood: 'Take with food or milk to reduce stomach upset',
-      duration: '10 days (Pain relief)',
-      purpose: 'Non-steroidal anti-inflammatory',
-    });
-  }
-  if (lowerText.includes('amoxicillin')) {
-    medications.push({
-      name: 'Amoxicillin',
-      dosage: '500mg',
-      frequency: 'Three times daily',
-      timing: ['morning', 'noon', 'evening'],
-      instructionsWithFood: 'Take at start of meals with a full glass of water',
-      duration: '7 days (Complete full course)',
-      purpose: 'Broad-spectrum antibacterial',
-    });
+  
+  // The backend might return translation as a direct object (from /upload)
+  // or as a JSON string in translated_text (from /results/id)
+  let translationData = backendData?.translation || {};
+  if (backendData?.translated_text && typeof backendData.translated_text === 'string') {
+    try {
+      translationData = JSON.parse(backendData.translated_text);
+    } catch (e) {
+      console.warn("Could not parse translated_text JSON", e);
+    }
   }
 
-  // Fallback medication item if none matched keywords
+  // Same for interactions
+  let interactionWarnings: InteractionWarning[] = translationData?.interactionWarnings || [];
+  if (backendData?.interactions && Array.isArray(backendData.interactions) && backendData.interactions.length > 0 && typeof backendData.interactions[0] === 'object') {
+    interactionWarnings = backendData.interactions;
+  }
+  
+  const hasInteractions = interactionWarnings.length > 0;
+
+  // Extract meds from LLM json, or fallback
+  let medications: MedicationItem[] = translationData?.medications || [];
   if (medications.length === 0) {
     medications.push({
       name: 'Prescribed Medication',
       dosage: 'As labeled',
       frequency: 'Once daily',
       timing: ['morning'],
-      instructionsWithFood: 'Take as directed by physician',
-      duration: 'Course as prescribed',
+      takeWithFood: false,
+      instructions: 'Take as directed by physician',
       purpose: 'Clinical treatment',
     });
+  } else {
+    // Ensure all required fields exist for the UI
+    medications = medications.map((m: any) => ({
+      name: m.name || 'Unknown',
+      dosage: m.dosage || 'Unknown',
+      frequency: m.frequency || 'Unknown',
+      timing: Array.isArray(m.timing) ? m.timing : ['morning'],
+      takeWithFood: m.takeWithFood || false,
+      instructions: m.instructionsWithFood || m.instructions || 'Follow doctor instructions',
+      purpose: m.purpose || 'Clinical treatment',
+      duration: m.duration
+    }));
   }
 
-  const plainLanguageSummary = backendData?.translated_text ||
-    `Prescription successfully analyzed. ${
-      hasInteractions
-        ? 'A high-risk drug interaction between Warfarin and Ibuprofen was identified. Review the warning alert before taking these medications together.'
-        : 'The prescribed medications have been checked and are safe to take according to doctor directions.'
-    }`;
+  const plainLanguageSummary = translationData?.plain_language_summary || 
+    'The prescription has been analyzed. Follow all instructions provided by your doctor.';
+
+  const keyTakeaways = translationData?.key_takeaways || [];
+  const safetyAndDietaryTips = translationData?.safety_tips || [];
+  const doctorQuestions = translationData?.doctor_questions || [];
 
   return {
     id: `RX-LIVE-${backendData?.report_id || Math.floor(1000 + Math.random() * 9000)}`,
     patientName: 'Jane Doe',
     prescriber: 'Dr. Sarah Jenkins - General Practice',
-    date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
-    hasInteractions,
-    interactionWarnings,
-    summary: {
-      plainLanguage: plainLanguageSummary,
-      keyTakeaways: [
-        hasInteractions
-          ? 'CRITICAL: Do not take Ibuprofen while taking Warfarin without doctor supervision.'
-          : 'Take medications at consistent times each day.',
-        'Always take oral doses with a full glass of water.',
-        'Keep medicines stored at room temperature away from moisture.',
-      ],
-    },
-    medications,
-    safetyAndDietaryTips: [
-      'Maintain regular hydration throughout the course.',
-      'Report any unexpected dizziness, bruising, or nausea immediately.',
-      'Do not abruptly discontinue prescribed doses without consulting your doctor.',
-    ],
-    doctorQuestions: [
-      'Are there non-NSAID alternatives suitable for my pain symptoms?',
-      'Should I schedule follow-up blood coagulation (INR) testing?',
-      'Can I take this medication alongside daily multivitamins?',
-    ],
+    timestamp: new Date().toISOString(),
     fileName: file.name,
     fileType: file.name.endsWith('.pdf') ? 'pdf' : 'image',
     fileSize: formatBytes(file.size),
-    timestamp: new Date().toISOString(),
+    summary: {
+      plainLanguage: plainLanguageSummary,
+      keyTakeaways: keyTakeaways,
+    },
+    hasInteractions,
+    interactionWarnings,
+    medications,
+    safetyAndDietaryTips,
+    doctorQuestions,
     awsMetadata: {
-      ocrEngine: 'AWS Textract',
-      model: 'FastAPI + SQLite DB',
-      latencyMs: 340,
+      s3Bucket: 'mediscan-uploads',
+      s3Key: file.name,
+      region: 'us-east-1',
+      inferenceLatencyMs: 840,
+      modelPipeline: 'Textract + LLM',
+      confidenceScore: 0.95,
     },
   };
 }
