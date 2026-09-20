@@ -166,10 +166,10 @@ export default function Home() {
             </div>
           </div>
 
-          {/* User Welcome */}
+          {/* Header Title */}
           <div className="space-y-1">
             <h1 className="text-xl font-black tracking-tight text-[#23272A]">
-              Hello, Pragya! 👋
+              Prescription Radar
             </h1>
             <p className="text-xs text-[#79828B] font-medium">
               Scan your prescription to check for dangerous drug interactions
