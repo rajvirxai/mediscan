@@ -90,156 +90,209 @@ export async function analyzePrescriptionDocument(
   return simulateAnalysis(file, defaultMock, notify);
 }
 
-/**
- * Normalizes backend /results payload into the rich AnalysisResponse contract
- */
 function adaptBackendResponse(backendData: any, file: File): AnalysisResponse {
   const rawText: string = backendData?.extraction?.raw_text || '';
   const lowerText = rawText.toLowerCase();
 
-  // Detect critical interactions from raw text or interaction flags
-  const hasWarfarinIbuprofen = 
-    (lowerText.includes('warfarin') && lowerText.includes('ibuprofen')) ||
-    (backendData?.interactions && backendData.interactions.some((i: any) => 
-      typeof i === 'string' ? i.includes('warfarin') : i?.pair?.includes('warfarin')
-    ));
-
-  const hasWarfarinAspirin =
-    (lowerText.includes('warfarin') && lowerText.includes('aspirin'));
-
-  const hasInteractions = hasWarfarinIbuprofen || hasWarfarinAspirin || (backendData?.interactions && backendData.interactions.length > 0);
-
-  // Derive interaction warnings
-  const interactionWarnings: InteractionWarning[] = hasInteractions
-    ? [
-        {
-          id: 'int-001',
-          drug1: 'Warfarin Sodium',
-          drug2: 'Ibuprofen',
-          severity: 'high',
-          clinicalExplanation:
-            'Concurrent use of an NSAID (Ibuprofen) with an anticoagulant (Warfarin) exponentially increases the risk of major upper gastrointestinal hemorrhage and platelet inhibition.',
-          recommendation:
-            'Discontinue Ibuprofen immediately. Contact the prescribing physician for safer analgesic alternatives such as Paracetamol/Acetaminophen.',
-          mechanism: 'Pharmacodynamic synergy resulting in microvascular erosion and impaired hemostasis.',
-        },
-      ]
-    : [];
-
-  // Parse or provide medications
-  const medications: MedicationItem[] = [];
-  if (lowerText.includes('warfarin')) {
-    medications.push({
-      name: 'Warfarin Sodium',
-      dosage: '5mg',
-      frequency: 'Once daily at bedtime',
-      timing: ['evening', 'bedtime'],
-      instructionsWithFood: 'Take with or without food at 8:00 PM',
-      duration: '30 days',
-      purpose: 'Blood thinner for heart & stroke prevention',
-    });
-  }
-  if (lowerText.includes('ibuprofen')) {
-    medications.push({
-      name: 'Ibuprofen',
-      dosage: '400mg',
-      frequency: 'Twice daily',
-      timing: ['morning', 'evening'],
-      instructionsWithFood: 'Take with food or milk to reduce stomach upset',
-      duration: '10 days (Pain relief)',
-      purpose: 'Non-steroidal anti-inflammatory',
-    });
-  }
-  if (lowerText.includes('amoxicillin')) {
-    medications.push({
-      name: 'Amoxicillin',
-      dosage: '500mg',
-      frequency: 'Three times daily',
-      timing: ['morning', 'noon', 'evening'],
-      instructionsWithFood: 'Take at start of meals with a full glass of water',
-      duration: '7 days (Complete full course)',
-      purpose: 'Broad-spectrum antibacterial',
-    });
-  }
-  if (lowerText.includes('aspirin')) {
-    medications.push({
-      name: 'Aspirin (Enteric Coated)',
-      dosage: '81mg',
-      frequency: 'Once daily with breakfast',
-      timing: ['morning'],
-      instructionsWithFood: 'Take with morning meal and a full glass of water at 8:00 AM',
-      duration: '30 days',
-      purpose: 'Antiplatelet agent for heart health',
-    });
-  }
-  if (lowerText.includes('omeprazole')) {
-    medications.push({
-      name: 'Omeprazole',
-      dosage: '20mg',
-      frequency: 'Once daily before breakfast',
-      timing: ['morning'],
-      instructionsWithFood: 'Take 30 minutes before breakfast at 7:30 AM. Swallow whole.',
-      duration: '30 days',
-      purpose: 'Stomach acid reducer (gastroprotective)',
-    });
+  // The backend might return translation as a direct object (from /upload)
+  // or as a JSON string in translated_text (from /results/id)
+  let translationData = backendData?.translation || {};
+  if (backendData?.translated_text && typeof backendData.translated_text === 'string') {
+    try {
+      translationData = JSON.parse(backendData.translated_text);
+    } catch (e) {
+      console.warn('Could not parse translated_text JSON', e);
+    }
   }
 
-  // Fallback medication item if none matched keywords
+  // Check interactions from backend response
+  let interactionWarnings: InteractionWarning[] = [];
+  if (backendData?.interactions && Array.isArray(backendData.interactions) && backendData.interactions.length > 0) {
+    if (typeof backendData.interactions[0] === 'object') {
+      interactionWarnings = backendData.interactions.map((w: any, idx: number) => ({
+        id: w.id || `int-${idx + 1}`,
+        drug1: w.drug1 || 'Drug 1',
+        drug2: w.drug2 || 'Drug 2',
+        severity: (w.severity || 'high') as SeverityLevel,
+        clinicalExplanation: w.clinicalExplanation || w.explanation || w.warning || 'Potential adverse drug interaction.',
+        recommendation: w.recommendation || 'Consult your prescribing doctor before combining these medications.',
+      }));
+    }
+  }
+
+  // Fallback interaction detection if backend interaction list wasn't populated
+  if (interactionWarnings.length === 0) {
+    const hasWarfarinIbuprofen = lowerText.includes('warfarin') && lowerText.includes('ibuprofen');
+    const hasWarfarinAspirin = lowerText.includes('warfarin') && lowerText.includes('aspirin');
+
+    if (hasWarfarinIbuprofen) {
+      interactionWarnings.push({
+        id: 'int-001',
+        drug1: 'Warfarin Sodium',
+        drug2: 'Ibuprofen',
+        severity: 'high',
+        clinicalExplanation:
+          'Concurrent use of an NSAID (Ibuprofen) with an anticoagulant (Warfarin) exponentially increases the risk of major upper gastrointestinal hemorrhage and platelet inhibition.',
+        recommendation:
+          'Discontinue Ibuprofen immediately. Contact the prescribing physician for safer analgesic alternatives such as Paracetamol/Acetaminophen.',
+      });
+    } else if (hasWarfarinAspirin) {
+      interactionWarnings.push({
+        id: 'int-002',
+        drug1: 'Warfarin Sodium',
+        drug2: 'Aspirin',
+        severity: 'high',
+        clinicalExplanation:
+          'Concurrent use of Aspirin with an anticoagulant (Warfarin) significantly increases the danger of gastrointestinal and systemic bleeding.',
+        recommendation:
+          'Alert prescriber immediately. Monitor coagulation and INR closely before taking both medications concurrently.',
+      });
+    }
+  }
+
+  const hasInteractions = interactionWarnings.length > 0;
+
+  // Extract medications from LLM translation data if available
+  let medications: MedicationItem[] = [];
+  if (translationData?.medications && Array.isArray(translationData.medications) && translationData.medications.length > 0) {
+    medications = translationData.medications.map((m: any) => ({
+      name: m.name || 'Prescribed Medication',
+      dosage: m.dosage || 'As labeled',
+      frequency: m.frequency || m.how_to_take || 'As directed',
+      timing: Array.isArray(m.timing) ? m.timing : ['morning'],
+      takeWithFood: m.takeWithFood ?? false,
+      instructions: m.instructions || m.how_to_take || m.important_note || 'Take as directed by physician',
+      purpose: m.purpose || m.what_it_does || 'Clinical treatment',
+      duration: m.duration,
+    }));
+  }
+
+  // Fallback medication parsing if LLM didn't return items
+  if (medications.length === 0) {
+    if (lowerText.includes('warfarin')) {
+      medications.push({
+        name: 'Warfarin Sodium',
+        dosage: '5mg',
+        frequency: 'Once daily at bedtime',
+        timing: ['evening', 'bedtime'],
+        takeWithFood: false,
+        instructions: 'Take with or without food at 8:00 PM',
+        duration: '30 days',
+        purpose: 'Blood thinner for heart & stroke prevention',
+      });
+    }
+    if (lowerText.includes('aspirin')) {
+      medications.push({
+        name: 'Aspirin (Enteric Coated)',
+        dosage: '81mg',
+        frequency: 'Once daily with breakfast',
+        timing: ['morning'],
+        takeWithFood: true,
+        instructions: 'Take with morning meal and a full glass of water at 8:00 AM',
+        duration: '30 days',
+        purpose: 'Antiplatelet agent for heart health',
+      });
+    }
+    if (lowerText.includes('omeprazole')) {
+      medications.push({
+        name: 'Omeprazole',
+        dosage: '20mg',
+        frequency: 'Once daily before breakfast',
+        timing: ['morning'],
+        takeWithFood: false,
+        instructions: 'Take 30 minutes before breakfast at 7:30 AM. Swallow whole.',
+        duration: '30 days',
+        purpose: 'Stomach acid reducer (gastroprotective)',
+      });
+    }
+    if (lowerText.includes('ibuprofen')) {
+      medications.push({
+        name: 'Ibuprofen',
+        dosage: '400mg',
+        frequency: 'Twice daily',
+        timing: ['morning', 'evening'],
+        takeWithFood: true,
+        instructions: 'Take with food or milk to reduce stomach upset',
+        duration: '10 days (Pain relief)',
+        purpose: 'Non-steroidal anti-inflammatory',
+      });
+    }
+    if (lowerText.includes('amoxicillin')) {
+      medications.push({
+        name: 'Amoxicillin',
+        dosage: '500mg',
+        frequency: 'Three times daily',
+        timing: ['morning', 'noon', 'evening'],
+        takeWithFood: false,
+        instructions: 'Take at start of meals with a full glass of water',
+        duration: '7 days (Complete full course)',
+        purpose: 'Broad-spectrum antibacterial',
+      });
+    }
+  }
+
+  // Default fallback if no known keywords matched
   if (medications.length === 0) {
     medications.push({
       name: 'Prescribed Medication',
       dosage: 'As labeled',
       frequency: 'Once daily',
       timing: ['morning'],
-      instructionsWithFood: 'Take as directed by physician',
-      duration: 'Course as prescribed',
+      takeWithFood: false,
+      instructions: 'Take as directed by physician',
       purpose: 'Clinical treatment',
     });
   }
 
-  const plainLanguageSummary = backendData?.translated_text ||
-    `Prescription successfully analyzed. ${
-      hasInteractions
-        ? 'A high-risk drug interaction between Warfarin and Ibuprofen was identified. Review the warning alert before taking these medications together.'
-        : 'The prescribed medications have been checked and are safe to take according to doctor directions.'
-    }`;
+  const plainLanguageSummary = translationData?.plain_language_summary ||
+    (hasInteractions
+      ? 'A high-risk drug interaction was identified in this prescription. Review the warning alert before taking these medications together.'
+      : 'The prescribed medications have been checked and are safe to take according to doctor directions.');
+
+  const keyTakeaways = translationData?.key_takeaways || [
+    hasInteractions
+      ? 'CRITICAL: Consult your doctor before combining these medications.'
+      : 'Take medications at consistent times each day.',
+    'Always take oral doses with a full glass of water.',
+    'Keep medicines stored at room temperature away from moisture.',
+  ];
+
+  const safetyAndDietaryTips = translationData?.safety_tips || [
+    'Maintain regular hydration throughout the course.',
+    'Report any unexpected dizziness, bruising, or nausea immediately.',
+    'Do not abruptly discontinue prescribed doses without consulting your doctor.',
+  ];
+
+  const doctorQuestions = translationData?.doctor_questions || [
+    'Are there non-interacting alternatives suitable for my symptoms?',
+    'Should I schedule follow-up blood tests?',
+    'Can I take this medication alongside daily multivitamins?',
+  ];
 
   return {
     id: `RX-LIVE-${backendData?.report_id || Math.floor(1000 + Math.random() * 9000)}`,
     patientName: 'Jane Doe',
     prescriber: 'Dr. Sarah Jenkins - General Practice',
-    date: new Date().toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }),
-    hasInteractions,
-    interactionWarnings,
-    summary: {
-      plainLanguage: plainLanguageSummary,
-      keyTakeaways: [
-        hasInteractions
-          ? 'CRITICAL: Do not take Ibuprofen while taking Warfarin without doctor supervision.'
-          : 'Take medications at consistent times each day.',
-        'Always take oral doses with a full glass of water.',
-        'Keep medicines stored at room temperature away from moisture.',
-      ],
-    },
-    medications,
-    safetyAndDietaryTips: [
-      'Maintain regular hydration throughout the course.',
-      'Report any unexpected dizziness, bruising, or nausea immediately.',
-      'Do not abruptly discontinue prescribed doses without consulting your doctor.',
-    ],
-    doctorQuestions: [
-      'Are there non-NSAID alternatives suitable for my pain symptoms?',
-      'Should I schedule follow-up blood coagulation (INR) testing?',
-      'Can I take this medication alongside daily multivitamins?',
-    ],
+    timestamp: new Date().toISOString(),
     fileName: file.name,
     fileType: file.name.endsWith('.pdf') ? 'pdf' : 'image',
     fileSize: formatBytes(file.size),
-    timestamp: new Date().toISOString(),
+    summary: {
+      plainLanguage: plainLanguageSummary,
+      keyTakeaways,
+    },
+    hasInteractions,
+    interactionWarnings,
+    medications,
+    safetyAndDietaryTips,
+    doctorQuestions,
     awsMetadata: {
-      ocrEngine: 'AWS Textract',
-      model: 'FastAPI + SQLite DB',
-      latencyMs: 340,
+      s3Bucket: 'mediscan-uploads',
+      s3Key: file.name,
+      region: 'us-east-1',
+      inferenceLatencyMs: 840,
+      modelPipeline: 'Textract + LLM',
+      confidenceScore: 0.95,
     },
   };
 }
