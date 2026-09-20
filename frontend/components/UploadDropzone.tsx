@@ -2,16 +2,19 @@
 
 import React, { useState, useRef } from 'react';
 import { Camera, UploadCloud, ShieldAlert, CheckCircle, Sparkles, FolderOpen } from 'lucide-react';
+import { SamplePicker } from './SamplePicker';
 
 interface UploadDropzoneProps {
   onFileSelect: (file: File | { name: string; type: string; size: number }) => void;
   onSelectPreset: (preset: 'flagged' | 'clean') => void;
+  onSampleFileSelect?: (file: File) => void;
   disabled?: boolean;
 }
 
 export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
   onFileSelect,
   onSelectPreset,
+  onSampleFileSelect,
   disabled = false,
 }) => {
   const [isDragOver, setIsDragOver] = useState(false);
@@ -122,46 +125,48 @@ export const UploadDropzone: React.FC<UploadDropzoneProps> = ({
         </div>
       </div>
 
-      {/* Pre-loaded Sample Prescriptions */}
-      <div className="rounded-[24px] bg-white p-3.5 border border-[#EDEDE5] bento-shadow">
+      {/* Real Sample Document Picker (4 documents from data/sample_documents) */}
+      <SamplePicker
+        onSampleSelect={(file) => {
+          if (onSampleFileSelect) {
+            onSampleFileSelect(file);
+          } else {
+            onFileSelect(file);
+          }
+        }}
+        disabled={disabled}
+      />
+
+      {/* Quick Mock Presets (offline fallback) */}
+      <div className="rounded-[24px] bg-white p-3 border border-[#EDEDE5] bento-shadow">
         <div className="flex items-center gap-1.5 text-xs text-[#79828B] mb-2 px-1">
           <Sparkles className="h-3.5 w-3.5 text-[#F5CA68]" />
-          <span className="font-semibold text-[#23272A]">Quick Test Presets:</span>
+          <span className="font-semibold text-[#23272A]">Offline Presets:</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={() => onSelectPreset('flagged')}
-            className="flex items-center justify-between rounded-2xl bg-[#FDCBB8]/60 border border-[#F99E7F]/40 p-2.5 text-left text-xs font-medium text-[#7C2D12] hover:bg-[#FDCBB8] active:scale-95 transition-all"
+            className="flex items-center gap-2 rounded-2xl bg-[#FDCBB8]/40 border border-[#F99E7F]/30 p-2 text-left text-[10px] font-medium text-[#7C2D12] hover:bg-[#FDCBB8] active:scale-95 transition-all"
           >
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="h-4 w-4 text-[#EA580C] flex-shrink-0" />
-              <div>
-                <div className="font-bold text-[#431407]">High-Risk Conflict</div>
-                <div className="text-[10px] text-[#9A3412]">Warfarin + Ibuprofen</div>
-              </div>
+            <ShieldAlert className="h-3.5 w-3.5 text-[#EA580C] flex-shrink-0" />
+            <div>
+              <div className="font-bold text-[#431407]">⚠️ Flagged</div>
+              <div className="text-[9px] text-[#9A3412]">Mock Warfarin</div>
             </div>
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-bold text-[#EA580C]">
-              Load
-            </span>
           </button>
 
           <button
             type="button"
             onClick={() => onSelectPreset('clean')}
-            className="flex items-center justify-between rounded-2xl bg-[#DFEFB3]/70 border border-[#BEDB76]/50 p-2.5 text-left text-xs font-medium text-[#2E4A13] hover:bg-[#DFEFB3] active:scale-95 transition-all"
+            className="flex items-center gap-2 rounded-2xl bg-[#DFEFB3]/50 border border-[#BEDB76]/40 p-2 text-left text-[10px] font-medium text-[#2E4A13] hover:bg-[#DFEFB3] active:scale-95 transition-all"
           >
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-[#4D7C0F] flex-shrink-0" />
-              <div>
-                <div className="font-bold text-[#1A2E05]">Safe ENT Course</div>
-                <div className="text-[10px] text-[#3F6212]">Amoxicillin + Probiotics</div>
-              </div>
+            <CheckCircle className="h-3.5 w-3.5 text-[#4D7C0F] flex-shrink-0" />
+            <div>
+              <div className="font-bold text-[#1A2E05]">✓ Safe</div>
+              <div className="text-[9px] text-[#3F6212]">Mock Clean Rx</div>
             </div>
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[10px] font-bold text-[#4D7C0F]">
-              Load
-            </span>
           </button>
         </div>
       </div>

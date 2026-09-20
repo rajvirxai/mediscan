@@ -101,6 +101,14 @@ export default function Home() {
     }
   };
 
+  // Handle real sample file loaded from /samples/ directory
+  const handleSampleFileSelect = async (file: File) => {
+    setSelectedFile(file);
+    setActivePreset(null);
+    // Auto-trigger analysis with the real file through the backend API
+    await runAnalysis(file, 'auto');
+  };
+
   const handleReset = () => {
     setSelectedFile(null);
     setProcessingStep('idle');
@@ -210,6 +218,7 @@ export default function Home() {
               <UploadDropzone
                 onFileSelect={handleFileSelect}
                 onSelectPreset={handleSelectPreset}
+                onSampleFileSelect={handleSampleFileSelect}
                 disabled={isAnalyzing}
               />
             ) : (
